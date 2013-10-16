@@ -297,8 +297,10 @@ abstract class CommonStringWrapperTest extends TestCase
     public function strrposProvider()
     {
         return array(
-            array('ascii', 'abcdefghijkl', 'g', 3, 6),
-            array('utf-8', 'abcdefghijkl', 'g', 3, 6),
+            array('ascii', 'abcdefghijklabcdefghi', 'g', -4, 6),
+            array('utf-8', 'abcdefghijklabcdefghi', 'g', 0, 18),
+            array('utf-8', 'abcdefghijklabcdefghi', 'g', 3, 18),
+            array('utf-8', 'abcdefghijklabcdefghi', 'g', 20, false),
             array('utf-8', 'äöüß',         'ü', 1, 2),
         );
     }
