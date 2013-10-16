@@ -293,4 +293,32 @@ abstract class CommonStringWrapperTest extends TestCase
         $result = $wrapper->strPad($input, $padLength, $padString, $padType);
         $this->assertSame($expected, $result);
     }
+
+    public function strrposProvider()
+    {
+        return array(
+            array('ascii', 'abcdefghijkl', 'g', 3, 6),
+            array('utf-8', 'abcdefghijkl', 'g', 3, 6),
+            array('utf-8', 'äöüß',         'ü', 1, 2),
+        );
+    }
+
+    /**
+     * @dataProvider strrposProvider
+     * @param string $encoding
+     * @param string $haystack
+     * @param string $needle
+     * @param int    $offset
+     * @param mixed  $expected
+     */
+    public function testStrrpos($encoding, $haystack, $needle, $offset, $expected)
+    {
+        $wrapper = $this->getWrapper($encoding);
+        if (!$wrapper) {
+            $this->markTestSkipped("Encoding {$encoding} not supported");
+        }
+
+        $result = $wrapper->strrpos($haystack, $needle, $offset);
+        $this->assertSame($expected, $result);
+    }
 }
