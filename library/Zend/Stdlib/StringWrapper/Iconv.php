@@ -268,7 +268,11 @@ class Iconv extends AbstractStringWrapper
      */
     public function strrpos($haystack, $needle, $offset = 0)
     {
-        return iconv_strrpos($haystack, $needle, $offset, $this->getEncoding());
+        if ($offset !== 0) {
+            // @todo
+        }
+
+        return iconv_strrpos($haystack, $needle, $this->getEncoding());
     }
 
     /**
