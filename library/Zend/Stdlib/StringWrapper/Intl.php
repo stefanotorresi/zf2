@@ -80,4 +80,17 @@ class Intl extends AbstractStringWrapper
     {
         return grapheme_strpos($haystack, $needle, $offset);
     }
+
+    /**
+     * Find the position of the last occurrence of a substring in a string
+     *
+     * @param string $haystack
+     * @param string $needle
+     * @param int    $offset
+     * @return int|false
+     */
+    public function strrpos($haystack, $needle, $offset = 0)
+    {
+        return grapheme_strrpos($haystack, $needle, $offset);
+    }
 }
