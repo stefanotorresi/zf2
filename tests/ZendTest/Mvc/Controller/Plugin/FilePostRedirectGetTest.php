@@ -338,7 +338,10 @@ class FilePostRedirectGetTest extends TestCase
             )
         ));
 
+        // File for first request
         copy(__DIR__ . '/TestAsset/nullfile', __DIR__ . '/TestAsset/nullfile_copy');
+        // File for second request
+        copy(__DIR__ . '/TestAsset/nullfile', __DIR__ . '/TestAsset/nullfile_copy2');
 
         $request = $this->request;
         $request->setMethod('POST');
@@ -354,7 +357,7 @@ class FilePostRedirectGetTest extends TestCase
         )));
         $request->setFiles(new Parameters(array(
             'collection' => array(
-                0 => array(
+                1 => array(
                     'file' => array(
                         'name' => 'test.jpg',
                         'type' => 'image/jpeg',
@@ -376,6 +379,10 @@ class FilePostRedirectGetTest extends TestCase
             'collection' => array(
                 0 => array(
                     'text' => 'testvalue1',
+                    'file' => null,
+                ),
+                1 => array(
+                    'text' => null,
                     'file' => array(
                         'name' => 'test.jpg',
                         'type' => 'image/jpeg',
@@ -383,20 +390,78 @@ class FilePostRedirectGetTest extends TestCase
                         'tmp_name' => __DIR__ . '/TestAsset/testfile.jpg',
                         'error' => 0
                     ),
-                ),
-                1 => array(
-                    'text' => null,
-                    'file' => null,
                 )
             )
         ), $data);
 
-        $this->assertFileExists($data['collection'][0]['file']['tmp_name']);
+        $this->assertFileExists($data['collection'][1]['file']['tmp_name']);
 
-        unlink($data['collection'][0]['file']['tmp_name']);
 
         $messages = $form->getMessages();
         $this->assertTrue(isset($messages['collection'][1]['text'][NotEmpty::IS_EMPTY]));
-        $this->assertTrue(isset($messages['collection'][1]['file'][NotEmpty::IS_EMPTY]));
+        $this->assertTrue(isset($messages['collection'][0]['file'][NotEmpty::IS_EMPTY]));
+
+        // All looks ok. Now do second request and merging test
+        $request->setMethod('POST');
+        $request->setPost(new Parameters(array(
+            'collection' => array(
+                0 => array(
+                    'text' => 'testvalue1',
+                ),
+                1 => array(
+                    'text' => 'testvalue2',
+                )
+            )
+        )));
+        $request->setFiles(new Parameters(array(
+            'collection' => array(
+                0 => array(
+                    'file' => array(
+                        'name' => 'test2.jpg',
+                        'type' => 'image/jpeg',
+                        'size' => 20480,
+                        'tmp_name' => __DIR__ . '/TestAsset/nullfile_copy2',
+                        'error' => UPLOAD_ERR_OK
+                    ),
+                ),
+            )
+        )));
+
+        $this->controller->dispatch($this->request, $this->response);
+        $this->controller->fileprg($form, '/test/getPage', true);
+
+        $valid = $form->isValid();
+
+        $this->assertEquals(array(), $form->getMessages());
+        $this->assertTrue($valid);
+
+        $data = $form->getData();
+
+        $this->assertEquals(array(
+            'collection' => array(
+                0 => array(
+                    'text' => 'testvalue1',
+                    'file' => array(
+                        'name' => 'test2.jpg',
+                        'type' => 'image/jpeg',
+                        'size' => 20480,
+                        'tmp_name' => __DIR__ . '/TestAsset/testfile.jpg',
+                        'error' => 0
+                    ),
+                ),
+                1 => array(
+                    'text' => 'testvalue2',
+                    'file' => array(
+                        'name' => 'test.jpg',
+                        'type' => 'image/jpeg',
+                        'size' => 20480,
+                        'tmp_name' => __DIR__ . '/TestAsset/testfile.jpg',
+                        'error' => 0
+                    ),
+                )
+            )
+        ), $data);
+
+        unlink($data['collection'][0]['file']['tmp_name']);
     }
 }
