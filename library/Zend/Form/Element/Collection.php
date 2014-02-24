@@ -18,7 +18,7 @@ use Zend\Form\FieldsetInterface;
 use Zend\Form\FormInterface;
 use Zend\Stdlib\ArrayUtils;
 
-class Collection extends Fieldsett
+class Collection extends Fieldset
 {
     /**
      * Default template placeholder
